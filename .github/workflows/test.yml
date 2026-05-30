@@ -25,5 +25,5 @@ jobs:
         env:
           ACCOUNT_SID: ${{ secrets.ACCOUNT_SID }}
           AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
-          APIKEY: ${{ secrets.APIKEY }}
+          API_KEY: ${{ secrets.API_KEY }}
         run: python main.py
