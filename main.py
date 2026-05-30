@@ -59,6 +59,6 @@ client = Client(account_sid, auth_token)
 message = client.messages.create(
     from_='+14155238886',
     body=sms_text,
-    to='+917290996313'
+    to='+919828599969'
 )
 print(message.status)
