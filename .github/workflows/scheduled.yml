@@ -1,26 +1,15 @@
-name: Daily Script
+name: Weather SMS Alert
 
 on:
   schedule:
-    # ╔═══════════════════════════════════════════════════════════════╗
-    # ║  CHANGE THE LINE BELOW to set when your script runs          ║
-    # ║                                                                ║
-    # ║  Format:  'MINUTE HOUR * * *'                                  ║
-    # ║                                                                ║
-    # ║  Examples:                                                     ║
-    # ║    '0 9 * * *'   = 9:00 AM UTC daily                          ║
-    # ║    '30 14 * * *' = 2:30 PM UTC daily                          ║
-    # ║    '0 0 * * *'   = Midnight UTC daily                         ║
-    # ║                                                                ║
-    # ║  Use https://time.is/UTC to find your local time in UTC       ║
-    # ╚═══════════════════════════════════════════════════════════════╝
+    # Runs every minute
     - cron: '* * * * *'
 
-  # This adds a "Run workflow" button so you can test manually
+  # Manual trigger button
   workflow_dispatch:
 
 jobs:
-  run:
+  run-weather-alert:
     runs-on: ubuntu-latest
 
     steps:
@@ -37,10 +26,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run script
+      - name: Run weather alert script
         env:
-          # Your secrets are available as environment variables
-          # Add more secrets in Settings > Secrets > Actions
-          MY_EMAIL: ${{ secrets.MY_EMAIL }}
-          MY_PASSWORD: ${{ secrets.MY_PASSWORD }}
+          ACCOUNT_SID: ${{ secrets.ACCOUNT_SID }}
+          AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
+          APIKEY: ${{ secrets.APIKEY }}
         run: python main.py
