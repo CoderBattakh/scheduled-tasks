@@ -1,38 +1,64 @@
-# To run and test the code you need to update 4 places:
-# 1. Change MY_EMAIL/MY_PASSWORD to your own details.
-# 2. Go to your email provider and make it allow less secure apps.
-# 3. Update the SMTP ADDRESS to match your email provider.
-# 4. Update birthdays.csv to contain today's month and day.
-# See the solution video in the 100 Days of Python Course for explainations.
-
-
-from datetime import datetime
-import pandas
-import random
-import smtplib
 import os
+import requests
+from twilio.rest import Client
 
-# import os and use it to get the Github repository secrets
-MY_EMAIL = os.environ.get("MY_EMAIL")
-MY_PASSWORD = os.environ.get("MY_PASSWORD")
 
-today = datetime.now()
-today_tuple = (today.month, today.day)
+account_sid = os.environ.get(account_sid)
+auth_token = os.environ.get(auth_token)
 
-data = pandas.read_csv("birthdays.csv")
-birthdays_dict = {(data_row["month"], data_row["day"])                  : data_row for (index, data_row) in data.iterrows()}
-if today_tuple in birthdays_dict:
-    birthday_person = birthdays_dict[today_tuple]
-    file_path = f"letter_templates/letter_{random.randint(1, 3)}.txt"
-    with open(file_path) as letter_file:
-        contents = letter_file.read()
-        contents = contents.replace("[NAME]", birthday_person["name"])
+apikey=os.environ.get(apikey)
+api_endpoint="https://api.openweathermap.org/data/2.5/forecast"
 
-    with smtplib.SMTP("YOUR EMAIL PROVIDER SMTP SERVER ADDRESS") as connection:
-        connection.starttls()
-        connection.login(MY_EMAIL, MY_PASSWORD)
-        connection.sendmail(
-            from_addr=MY_EMAIL,
-            to_addrs=birthday_person["email"],
-            msg=f"Subject:Happy Birthday!\n\n{contents}"
-        )
+
+api_parameters={
+    'lat':28.7041,
+    'lon':77.1025,
+    'appid':apikey,
+    'cnt':4
+}
+response=requests.get(api_endpoint,params=api_parameters)
+response.raise_for_status()
+response_json=response.json()
+print(response_json)
+
+weather_update_list=response_json['list']
+
+# text_msg_rainy='You need to carry an umbrella ☔☔, you baddie'
+text_msg_rainy=('URGENT MESSAGE FROM THE GOVT OF INDIA\nFor the sake of the nation,we request you to make a small monetary'
+                ' donation towards Baddie Development Yojana.You need to transfer a sum of Rs 2100 only to the nearest baddie '
+                'i.e. your beloved, amazing batku.This money will be used in helping the nation progress and deal with urgent '
+                'matters of utmost importance.Kindly don\'t be a little bitch and just make the fucking transaction.')
+# text_msg_non_rainy='You just need yourself baddie, no umbrella.💋💋'
+text_msg_non_rainy=('URGENT MESSAGE FROM THE GOVT OF INDIA\nFor the sake of the nation,we request you to make a small monetary'
+                ' donation towards Baddie Development Yojana.You need to transfer a sum of Rs 2100 only to the nearest baddie '
+                'i.e. your beloved, amazing batku.This money will be used in helping the nation progress and deal with urgent '
+                'matters of utmost importance.Kindly don\'t be a little bitch and just make the fucking transaction.')
+will_rain=False
+# if not weather_update_list:
+#     raise 'No Weather Update List'
+# else:
+for item in weather_update_list:
+    if item['weather'][0]['id'] and item['weather'][0]['id']<800:
+        will_rain=True
+
+
+# if will_rain:
+#     client = Client(account_sid, auth_token)
+#     message = client.messages.create(
+#         from_='+17753688631',
+#         body='You need to carry an umbrella ☔☔, you baddie',
+#         to='+917290996313'
+#     )
+#     print(message.status)
+
+if will_rain:
+    sms_text=text_msg_rainy
+else:
+    sms_text=text_msg_non_rainy
+client = Client(account_sid, auth_token)
+message = client.messages.create(
+    from_='whatsapp:+14155238886',
+    body=sms_text,
+    to='whatsapp:+917290996313'
+)
+print(message.status)
