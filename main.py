@@ -57,8 +57,8 @@ else:
     sms_text=text_msg_non_rainy
 client = Client(account_sid, auth_token)
 message = client.messages.create(
-    from_='whatsapp:+14155238886',
+    from_='+14155238886',
     body=sms_text,
-    to='whatsapp:+917290996313'
+    to='+917290996313'
 )
 print(message.status)
